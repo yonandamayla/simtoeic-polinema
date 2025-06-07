@@ -1,21 +1,16 @@
 <div class="navbar-bg"></div>
 <div class="navbar-bg"></div>
 <nav class="navbar navbar-expand-lg main-navbar">
-    <form class="form-inline mr-auto">
-        <ul class="navbar-nav mr-3">
-            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></a></li>
-            <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i
-                        class="fas fa-search"></i></a></li>
-        </ul>
-        <div class="search-element">
-            <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="250">
-            <button class="btn" type="submit"><i class="fas fa-search"></i></button>
-        </div>
-    </form>
-    <ul class="navbar-nav navbar-right">
+    <ul class="navbar-nav mr-3">
         <li>
-            <a href="@if(Auth::check())
-                @if(Auth::user()->role === 'admin')
+            <a href="#" data-toggle="sidebar" class="nav-link nav-link-lg">
+                <i class="fas fa-bars"></i>
+            </a>
+        </li>
+    </ul>
+    <ul class="navbar-nav navbar-right ml-auto">
+        <li>
+            <a href="@if (Auth::check()) @if (Auth::user()->role === 'admin')
                     {{ route('admin.profile') }}
                 @elseif(Auth::user()->role === 'student')
                     {{ route('student.profile') }}
@@ -26,14 +21,14 @@
                 @elseif(Auth::user()->role === 'alumni')
                     {{ route('alumni.profile') }}
                 @else
-                    #
-                @endif
-            @else
-                #
-            @endif" class="nav-link nav-link-lg nav-link-user">
-                <img alt="image" src="
-                    @if(Auth::check())
-                        @php
+                    # @endif
+@else
+#
+            @endif"
+                class="nav-link nav-link-lg nav-link-user d-flex align-items-center">
+                <img alt="image"
+                    src="
+                    @if (Auth::check()) @php
                             $profilePicture = null;
                             if (Auth::user()->role === 'admin' && Auth::user()->admin && Auth::user()->admin->photo) {
                                 $profilePicture = Auth::user()->admin->photo;
@@ -55,13 +50,13 @@
                         @endphp
                         {{ $profilePicture ? asset($profilePicture) : asset('img/avatar/avatar-1.png') }}
                     @else
-                        {{ asset('img/avatar/avatar-1.png') }}
-                    @endif
-                " class="rounded-circle mr-1" style="width: 30px; height: 30px; object-fit: cover;">
-                <div class="d-sm-none d-lg-inline-block">
+                        {{ asset('img/avatar/avatar-1.png') }} @endif
+                "
+                    class="rounded-circle mr-1" style="width: 30px; height: 30px; object-fit: cover;">
+                <div class="d-none d-lg-inline-block ml-2">
                     Hi,
-                    @if(Auth::check())
-                        @if(Auth::user()->role === 'student' && Auth::user()->student)
+                    @if (Auth::check())
+                        @if (Auth::user()->role === 'student' && Auth::user()->student)
                             {{ Auth::user()->student->name }}
                         @elseif(Auth::user()->role === 'lecturer' && Auth::user()->lecturer)
                             {{ Auth::user()->lecturer->name }}

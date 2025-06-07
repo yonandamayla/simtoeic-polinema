@@ -174,8 +174,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        // Change this line
         return redirect()->route('auth.login');
     }
 }

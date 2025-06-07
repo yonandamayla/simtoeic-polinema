@@ -30,7 +30,6 @@ use App\Models\FaqModel;
 |
 */
 
-
 // Layout
 Route::get('/layout-default-layout', function () {
     return view('pages.layout-default-layout', ['type_menu' => 'layout']);
@@ -97,7 +96,6 @@ Route::get('/bootstrap-tooltip', function () {
 Route::get('/bootstrap-typography', function () {
     return view('pages.bootstrap-typography', ['type_menu' => 'bootstrap']);
 });
-
 
 // components
 Route::get('/components-article', function () {
@@ -221,8 +219,6 @@ Route::get('/', function () {
     return view('pages.landing-page');
 });
 
-
-
 // Authentication Routes
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -230,8 +226,8 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// Dashboard routes for each role (protected with auth middleware)
-Route::middleware(['auth'])->group(function () {
+// Dashboard routes for each role (protected with auth & prevent-back-history middleware)
+Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/dashboard-admin', function () {
         return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);
     })->name('admin.dashboard');
@@ -251,6 +247,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard-alumni', function () {
         return view('pages.dashboard-alumni', ['type_menu' => 'dashboard']);
     })->name('alumni.dashboard');
+
+    // Admin profile
+    Route::get('/admin/profile', [AdminProfileController::class, 'show'])->name('admin.profile');
+    Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+
+    // Exam Results
+    Route::get('/exam-results', [ExamResultController::class, 'index'])->name('exam-results.index');
+    Route::get('/exam-results/data', [ExamResultController::class, 'getResults'])->name('exam-results.data');
+    Route::post('/exam-results/import', [ExamResultController::class, 'import'])->name('exam-results.import.store');
+    Route::delete('/exam-results/delete-all', [ExamResultController::class, 'deleteAll'])->name('exam-results.delete-all');
+    Route::get('/exam-results/{id}', [ExamResultController::class, 'show'])->name('exam-results.show');
+    Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
+    Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
 });
 
 // Admin Notices Announcements route
@@ -272,10 +281,8 @@ Route::group(['prefix' => 'announcements'], function () {
     Route::post('/upload', [AnnouncementController::class, 'upload'])->name('announcements.upload');
 });
 
-
 // Admin Manage Users route
 Route::get('/users', function () {
-    // Adjust these queries based on your actual database schema
     $staffCount = StaffModel::count();
     $studentCount = StudentModel::count();
     $alumniCount = AlumniModel::count();
@@ -290,9 +297,8 @@ Route::get('/users', function () {
     ]);
 })->name('users');
 
-
 // Manage Users - Staff
-Route::group(['prefix' => 'manage-users/staff'], function () {
+Route::group(['prefix' => 'manage-users/staff', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/', function () {
         return view('users-admin.manage-user.staff.index', ['type_menu' => 'staff']);
     })->name('staff.index');
@@ -305,7 +311,7 @@ Route::group(['prefix' => 'manage-users/staff'], function () {
 });
 
 // Manage Users - Student
-Route::group(['prefix' => 'manage-users/student'], function () {
+Route::group(['prefix' => 'manage-users/student', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/', function () {
         return view('users-admin.manage-user.student.index', [
             'type_menu' => 'student',
@@ -321,7 +327,7 @@ Route::group(['prefix' => 'manage-users/student'], function () {
 });
 
 // Manage Users - Alumni
-Route::group(['prefix' => 'manage-users/alumni'], function () {
+Route::group(['prefix' => 'manage-users/alumni', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/', function () {
         return view('users-admin.manage-user.alumni.index', ['type_menu' => 'alumni']);
     })->name('alumni.index');
@@ -334,7 +340,7 @@ Route::group(['prefix' => 'manage-users/alumni'], function () {
 });
 
 // Manage Users - Lecturer
-Route::group(['prefix' => 'manage-users/lecturer'], function () {
+Route::group(['prefix' => 'manage-users/lecturer', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/', function () {
         return view('users-admin.manage-user.lecturer.index', ['type_menu' => 'lecturer']);
     })->name('lecturer.index');
@@ -347,33 +353,29 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
 });
 
 // Registration - Admin
-Route::prefix('registration')->group(function () {
+Route::prefix('registration')->middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/', [App\Http\Controllers\UserDataTableController::class, 'index'])->name('registration.index');
     Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
-
-    // AJAX modal routes
     Route::get('/{id}/show_ajax', [App\Http\Controllers\UserDataTableController::class, 'show_ajax']);
     Route::get('/{id}/edit_ajax', [App\Http\Controllers\UserDataTableController::class, 'edit_ajax']);
     Route::get('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'confirm_ajax']);
-
-    // AJAX action routes - make sure these are POST routes
     Route::post('/{id}/update_ajax', [App\Http\Controllers\UserDataTableController::class, 'update_ajax']);
     Route::post('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'delete_ajax']);
-
-    // Delete all users route
     Route::delete('/delete-all', [App\Http\Controllers\UserDataTableController::class, 'deleteAll'])->name('registration.delete-all');
 });
-Route::post('/registration', [App\Http\Controllers\UserDataTableController::class, 'store'])->name('registration.store');
+Route::post('/registration', [App\Http\Controllers\UserDataTableController::class, 'store'])->name('registration.store')->middleware(['auth', 'prevent-back-history']);
 
 // Student routes
-Route::group(['prefix' => 'student'], function () {
+Route::group(['prefix' => 'student', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
-    Route::get('/profile', [StudentController::class, 'profile'])->name('student.profile');  // The correct route name
+    Route::get('/profile', [StudentController::class, 'profile'])->name('student.profile');
     Route::post('/profile/update', [StudentController::class, 'updateProfile'])->name('student.profile.update');
+    Route::get('/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
+    Route::post('/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');
 });
 
 // Staff routes
-Route::group(['prefix' => 'staff'], function () {
+Route::group(['prefix' => 'staff', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/profile', [StaffController::class, 'profile'])->name('staff.profile');
     Route::post('/profile/update', [StaffController::class, 'updateProfile'])->name('staff.profile.update');
     Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
@@ -381,7 +383,7 @@ Route::group(['prefix' => 'staff'], function () {
 });
 
 // Alumni routes
-Route::group(['prefix' => 'alumni'], function () {
+Route::group(['prefix' => 'alumni', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
     Route::get('/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
     Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profile.update');
@@ -389,7 +391,7 @@ Route::group(['prefix' => 'alumni'], function () {
 });
 
 // Lecturer routes
-Route::group(['prefix' => 'lecturer'], function () {
+Route::group(['prefix' => 'lecturer', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard');
     Route::get('/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
     Route::post('/profile/update', [LecturerController::class, 'updateProfile'])->name('lecturer.profile.update');
@@ -406,24 +408,8 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/student/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
 Route::post('/student/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');
 
-// Admin Exam Results Routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/exam-results', [ExamResultController::class, 'index'])->name('exam-results.index');
-    Route::get('/exam-results/data', [ExamResultController::class, 'getResults'])->name('exam-results.data');
-    Route::post('/exam-results/import', [ExamResultController::class, 'import'])->name('exam-results.import.store');
-    Route::delete('/exam-results/delete-all', [ExamResultController::class, 'deleteAll'])->name('exam-results.delete-all');
-    Route::get('/exam-results/{id}', [ExamResultController::class, 'show'])->name('exam-results.show');
-    Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
-    Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
-});
-
-// Admin dashboard route
-Route::get('/dashboard-admin', [App\Http\Controllers\AdminDashboardController::class, 'index'])
-    ->name('admin.dashboard')
-    ->middleware('auth');
-
 // Admin FAQs route
-Route::group(['prefix' => 'faqs'], function () {
+Route::group(['prefix' => 'faqs', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/', function () {
         return view('users-admin.faq.index', [
             'type_menu' => 'faqs'
