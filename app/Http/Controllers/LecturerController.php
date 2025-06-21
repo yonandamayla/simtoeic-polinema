@@ -264,4 +264,17 @@ class LecturerController extends Controller
             'isRegistered' => $isRegistered
         ]);
     }
+
+    public function updateCertificateStatus($status)
+    {
+        $authUser = Auth::user();
+        $user = UserModel::find($authUser->user_id);
+        if ($user) {
+            $user->certificate_status = $status;
+            $user->save();
+            return redirect()->back()->with('success', 'Certifiate status updated successfully.');
+        } else {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+    }
 }

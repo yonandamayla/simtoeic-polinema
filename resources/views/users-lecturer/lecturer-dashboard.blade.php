@@ -118,7 +118,8 @@
                                             </span>
                                         </div>
                                         <div class="announcement-content p-3 bg-light rounded">
-                                            <p class="mb-0" style="font-size: 16px; font-weight: bold;">{{ $announcements->content }}</p>
+                                            <p class="mb-0" style="font-size: 16px; font-weight: bold;">
+                                                {{ $announcements->content }}</p>
                                         </div>
 
                                         @if ($announcements->announcement_file)
@@ -168,6 +169,28 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        @endif
+                                        @if ($announcements && strpos($announcements->content, 'Have you obtained the certificate?') !== false)
+                                            @if (Auth::user()->exam_status === 'success')
+                                                <div class="d-flex justify-content-end mt-2">
+                                                    @if ($user->certificate_status === 'not_taken')
+                                                        <form
+                                                            action="{{ route('lecturer.certificate.update', ['status' => 'taken']) }}"
+                                                            method="POST" style="display:inline;">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm">Yes - I
+                                                                Already obtained the certificate</button>
+                                                        </form>
+                                                    @else
+                                                        <span class="badge badge-success">Certificate Taken</span>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                <div class="alert alert-info mt-2" role="alert">
+                                                    Button to confirm certificate collection is only available after passing
+                                                    the exam.
+                                                </div>
+                                            @endif
                                         @endif
 
                                         <div class="d-flex justify-content-end mt-2">

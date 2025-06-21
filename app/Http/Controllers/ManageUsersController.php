@@ -19,7 +19,7 @@ class ManageUsersController extends Controller
 {
     public function list(Request $request)
     {
-        $user = UserModel::select('user_id', 'identity_number', 'role', 'exam_status', 'phone_number')
+        $user = UserModel::select('user_id', 'identity_number', 'role', 'exam_status', 'certificate_status', 'phone_number', 'telegram_chat_id', 'created_at', 'updated_at')
             ->with(['alumni', 'student', 'staff', 'lecturer', 'admin']);
 
         if ($request->has('role') && !empty($request->role)) {
@@ -147,13 +147,28 @@ class ManageUsersController extends Controller
                 }
                 return '<span class="badge ' . $badgeClass . '">' . ucfirst(str_replace('_', ' ', $examStatus)) . '</span>';
             })
+            ->addColumn('certificate_status', function ($user) {
+                $certificateStatus = $user->certificate_status ?? '-';
+                $badgeClass = '';
+                switch (strtolower($certificateStatus)) {
+                    case 'taken':
+                        $badgeClass = 'badge-success';
+                        break;
+                    case 'not_taken':
+                        $badgeClass = 'badge-danger';
+                        break;
+                    default:
+                        $badgeClass = 'badge-secondary';
+                }
+                return '<span class="badge ' . $badgeClass . '">' . ucfirst(str_replace('_', ' ', $certificateStatus)) . '</span>';
+            })
             ->addColumn('action', function ($user) {
                 $btn = '<button onclick="modalAction(\'' . url('users/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('users/' . $user->user_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('users/' . $user->user_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
-            ->rawColumns(['action', 'exam_status', 'name', 'home_address', 'current_address', 'ktp_scan', 'photo'])
+            ->rawColumns(['action', 'exam_status', 'certificate_status', 'name', 'home_address', 'current_address', 'ktp_scan', 'photo'])
             ->make(true);
     }
 

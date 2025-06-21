@@ -44,6 +44,7 @@ class UserModel extends Authenticatable
         'identity_number',
         'password',
         'exam_status',
+        'certificate_status',
         'phone_number',
         'telegram_chat_id',
         'remember_token',

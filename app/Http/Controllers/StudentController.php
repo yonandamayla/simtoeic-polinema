@@ -12,6 +12,7 @@ use App\Models\ExamRegistrationModel;
 use App\Models\VerificationRequestModel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
@@ -497,5 +498,18 @@ class StudentController extends Controller
                 'approved_at' => $request->formatted_approved_at
             ]
         ]);
+    }
+
+    public function updateCertificateStatus($status)
+    {
+        $authUser = Auth::user();
+        $user = UserModel::find($authUser->user_id);
+        if ($user) {
+            $user->certificate_status = $status;
+            $user->save();
+            return redirect()->back()->with('success', 'Certifiate status updated successfully.');
+        } else {
+            return redirect()->back()->with('error', 'User not found.');
+        }
     }
 }

@@ -310,6 +310,7 @@ Route::group(['prefix' => 'student', 'middleware' => ['auth', 'prevent-back-hist
     Route::post('/profile/update', [StudentController::class, 'updateProfile'])->name('student.profile.update');
     Route::get('/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
     Route::post('/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');
+    Route::post('/certificate/update/{status}', [StudentController::class, 'updateCertificateStatus'])->name('student.certificate.update');
 
     // Request routes
     Route::get('/request', [StudentController::class, 'requestIndex'])->name('student.request.index');
@@ -324,6 +325,7 @@ Route::group(['prefix' => 'staff', 'middleware' => ['auth', 'prevent-back-histor
     Route::get('/profile', [StaffController::class, 'profile'])->name('staff.profile');
     Route::post('/profile/update', [StaffController::class, 'updateProfile'])->name('staff.profile.update');
     Route::get('/registration', [StaffController::class, 'showRegistrationForm'])->name('staff.registration.form');
+       Route::post('/certificate/update/{status}', [StaffController::class, 'updateCertificateStatus'])->name('staff.certificate.update');
 });
 
 // Alumni routes
@@ -332,6 +334,7 @@ Route::group(['prefix' => 'alumni', 'middleware' => ['auth', 'prevent-back-histo
     Route::get('/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
     Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profile.update');
     Route::get('/registration', [AlumniController::class, 'showRegistrationForm'])->name('alumni.registration.form');
+       Route::post('/certificate/update/{status}', [AlumniController::class, 'updateCertificateStatus'])->name('alumni.certificate.update');
 });
 
 // Lecturer routes
@@ -340,6 +343,7 @@ Route::group(['prefix' => 'lecturer', 'middleware' => ['auth', 'prevent-back-his
     Route::get('/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
     Route::post('/profile/update', [LecturerController::class, 'updateProfile'])->name('lecturer.profile.update');
     Route::get('/registration', [LecturerController::class, 'showRegistrationForm'])->name('lecturer.registration.form');
+       Route::post('/certificate/update/{status}', [LecturerController::class, 'updateCertificateStatus'])->name('lecturer.certificate.update');
 });
 
 // admin routes

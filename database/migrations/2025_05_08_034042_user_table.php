@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('identity_number', 50)->unique();
             $table->string('password');
             $table->enum('exam_status', ['success', 'fail', 'not_yet'])->default('not_yet')->nullable();
+            $table->enum('certificate_status', ['taken', 'not_taken'])->default('not_taken');
             $table->string('phone_number', 15)->nullable();
             $table->string('telegram_chat_id')->nullable();
             $table->rememberToken(); // Add remember_token column

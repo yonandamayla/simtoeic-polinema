@@ -252,6 +252,7 @@
                                                 <th>Identity Number</th>
                                                 <th>Name</th>
                                                 <th>Exam Status</th>
+                                                <th>Certificate Status</th>
                                                 <th>KTP</th>
                                                 <th>Photo</th>
                                                 <th>Home Address</th>
@@ -493,6 +494,12 @@
                     },
                     {
                         data: "exam_status",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "certificate_status",
                         className: "",
                         orderable: true,
                         searchable: true
